@@ -8,32 +8,34 @@ import (
 	"github.com/leanovate/gopter/prop"
 )
 
+func fixedLeadingZeros(sha1sum []byte, n uint) bool {
+	// zero out leading n bits from randomly generated sha1sum
+	count := uint(0)
+	for i, _ := range sha1sum {
+		if count == n {
+			break
+		}
+
+		if n < 8 {
+			mask := uint8((1 << uint(8 - n)) - 1)
+			sha1sum[i] = sha1sum[i] & mask
+			break
+		} else {
+			sha1sum[i] = 0
+			count += 8
+		}
+	}
+	// TODO: turn on nth bit?
+	return leadingBits(sha1sum[:], m)
+}
+
 func TestLeadingBits(t *testing.T) {
 	parameters := gopter.DefaultTestParameters()
 	parameters.Rng.Seed(1234) // to generate reproducible results
 
 	properties := gopter.NewProperties(nil)
 	properties.Property("random shasum byte array with a known number of leading zeros", prop.ForAll(
-		func(sha1sum []byte, n uint) bool {
-			// zero out leading n bits from randomly generated sha1sum
-			count := uint(0)
-			for i, _ := range sha1sum {
-				if count == n {
-					break
-				}
-
-				if n < 8 {
-					mask := uint8((1 << uint(8 - n)) - 1)
-					sha1sum[i] = sha1sum[i] & mask
-					break
-				} else {
-					sha1sum[i] = 0
-					count += 8
-				}
-			}
-			// TODO: turn on nth bit?
-			return leadingBits(sha1sum[:], n)
-		},
+		fixedLeadingZeros,
 		gen.SliceOfN(20, gen.UInt8Range(0,255),
 			reflect.TypeOf(uint8(0))).
 			SuchThat(func(v interface{}) bool {
