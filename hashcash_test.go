@@ -26,7 +26,7 @@ func fixedLeadingZeros(sha1sum []byte, n uint) bool {
 		}
 	}
 	// TODO: turn on nth bit?
-	return leadingBits(sha1sum[:], m)
+	return leadingBits(sha1sum[:], n)
 }
 
 func TestLeadingBits(t *testing.T) {
