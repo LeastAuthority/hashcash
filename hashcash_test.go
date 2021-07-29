@@ -8,6 +8,8 @@ import (
 	"github.com/leanovate/gopter/prop"
 )
 
+// zero out n bits out of the given sha1sum slice and check for n
+// leading zero bits.
 func fixedLeadingZeros(sha1sum []byte, n uint) bool {
 	// zero out leading n bits from randomly generated sha1sum
 	count := uint(0)
@@ -25,7 +27,7 @@ func fixedLeadingZeros(sha1sum []byte, n uint) bool {
 			count += 8
 		}
 	}
-	// TODO: turn on nth bit?
+
 	return leadingBits(sha1sum[:], n)
 }
 
