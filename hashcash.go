@@ -2,6 +2,7 @@ package hashcash
 
 import (
 	"bytes"
+	"encoding/base64"
 	"crypto/rand"
 	"crypto/sha1"
 	"fmt"
@@ -33,11 +34,14 @@ func Mint(bits uint, resource string) (string, error) {
 		if err != nil {
 			return "", err
 		}
+		randString := base64.StdEncoding.EncodeToString(b)
 		attempt := Stamp{
 			Version:  1,
 			Bits:     bits,
 			Date:     timestamp,
 			Resource: resource,
+			Rand:     randString,
+			Counter:  counter,
 		}
 		if Valid(attempt.String(), bits) {
 			return attempt.String(), nil
