@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"crypto/sha1"
 	"fmt"
+	"time"
 )
 
 type Stamp struct {
@@ -23,7 +24,10 @@ func (stamp Stamp) String() string {
 func Mint(bits uint, resource string) (string, error) {
 	b := make([]byte, 12)
 	counter := 0
-	timestamp := "210623"
+
+	// had to look up the source code to understand the format
+	// string to be given. https://golang.org/src/time/format.go
+	timestamp := time.Now().Format("060102")
 	for true {
 		_, err := rand.Read(b)
 		if err != nil {
@@ -58,7 +62,7 @@ func leadingBits(shasum []byte, requiredBits uint) bool {
 		if bits >= requiredBits {
 			return true
 		}
-		if requiredBits-bits > 8 {
+		if requiredBits - bits > 8 {
 			if b == 0 {
 				bits += 8
 			} else {
