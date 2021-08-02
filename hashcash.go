@@ -27,7 +27,7 @@ func Mint(bits uint, resource string) (string, error) {
 	counter := uint(0)
 
 	if bits > (sha1.Size * 8) {
-		return nil, fmt.Errorf("number of bits should be ≤ %d", sha1.Size * 8)
+		return "", fmt.Errorf("number of bits should be ≤ %d", sha1.Size * 8)
 	}
 
 	// had to look up the source code to understand the format
