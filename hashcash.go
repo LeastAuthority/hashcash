@@ -15,16 +15,16 @@ type Stamp struct {
 	Date     string
 	Resource string
 	Rand     string
-	Counter  string
+	Counter  uint
 }
 
 func (stamp Stamp) String() string {
-	return fmt.Sprintf("%d:%d:%s:%s::%s:%s", stamp.Version, stamp.Bits, stamp.Date, stamp.Resource, stamp.Rand, stamp.Counter)
+	return fmt.Sprintf("%d:%d:%s:%s::%s:%d", stamp.Version, stamp.Bits, stamp.Date, stamp.Resource, stamp.Rand, stamp.Counter)
 }
 
 func Mint(bits uint, resource string) (string, error) {
 	b := make([]byte, 12)
-	counter := 0
+	counter := uint(0)
 
 	if bits > (sha1.Size * 8) {
 		return nil, fmt.Errorf("number of bits should be ≤ %d", sha1.Size * 8)
