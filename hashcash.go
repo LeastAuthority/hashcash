@@ -90,5 +90,5 @@ func leadingBits(shasum []byte, requiredBits uint) bool {
 			}
 		}
 	}
-	return false
+	return true
 }
