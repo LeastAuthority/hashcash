@@ -23,7 +23,7 @@ func (stamp Stamp) String() string {
 }
 
 func Mint(bits uint, resource string) (string, error) {
-	b := make([]byte, 12)
+	randBits := make([]byte, 12) // 96-bits of random data
 	counter := uint(0)
 
 	if bits > (sha1.Size * 8) {
@@ -34,11 +34,11 @@ func Mint(bits uint, resource string) (string, error) {
 	// string to be given. https://golang.org/src/time/format.go
 	timestamp := time.Now().Format("060102")
 	for true {
-		_, err := rand.Read(b)
+		_, err := rand.Read(randBits)
 		if err != nil {
 			return "", err
 		}
-		randString := base64.StdEncoding.EncodeToString(b)
+		randString := base64.StdEncoding.EncodeToString(randBits)
 		attempt := Stamp{
 			Version:  1,
 			Bits:     bits,
