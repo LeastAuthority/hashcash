@@ -26,6 +26,10 @@ func Mint(bits uint, resource string) (string, error) {
 	b := make([]byte, 12)
 	counter := 0
 
+	if bits > (sha1.Size * 8) {
+		return nil, fmt.Errorf("number of bits should be ≤ %d", sha1.Size * 8)
+	}
+
 	// had to look up the source code to understand the format
 	// string to be given. https://golang.org/src/time/format.go
 	timestamp := time.Now().Format("060102")
