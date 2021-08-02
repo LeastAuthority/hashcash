@@ -7,6 +7,7 @@ import (
 	"crypto/sha1"
 	"fmt"
 	"time"
+	"strconv"
 )
 
 type Stamp struct {
@@ -15,11 +16,11 @@ type Stamp struct {
 	Date     string
 	Resource string
 	Rand     string
-	Counter  uint
+	Counter  string
 }
 
 func (stamp Stamp) String() string {
-	return fmt.Sprintf("%d:%d:%s:%s::%s:%d", stamp.Version, stamp.Bits, stamp.Date, stamp.Resource, stamp.Rand, stamp.Counter)
+	return fmt.Sprintf("%d:%d:%s:%s::%s:%s", stamp.Version, stamp.Bits, stamp.Date, stamp.Resource, stamp.Rand, stamp.Counter)
 }
 
 func Mint(bits uint, resource string) (string, error) {
@@ -39,15 +40,19 @@ func Mint(bits uint, resource string) (string, error) {
 			return "", err
 		}
 		randString := base64.StdEncoding.EncodeToString(randBits)
+		countString := strconv.Itoa(int(counter))
+		counterString := base64.StdEncoding.EncodeToString([]byte(countString))
 		attempt := Stamp{
 			Version:  1,
 			Bits:     bits,
 			Date:     timestamp,
 			Resource: resource,
 			Rand:     randString,
-			Counter:  counter,
+			Counter:  counterString,
 		}
+		fmt.Printf("generated stamp: %s\n", attempt.String())
 		if Valid(attempt.String(), bits) {
+			fmt.Printf("found a valid stamp\n")
 			return attempt.String(), nil
 		}
 		counter += 1
