@@ -1,11 +1,11 @@
 package hashcash
 
 import (
-	"strings"
-	"testing"
 	"github.com/leanovate/gopter"
 	"github.com/leanovate/gopter/gen"
 	"github.com/leanovate/gopter/prop"
+	"strings"
+	"testing"
 )
 
 // zero out n bits out of the given sha1sum slice and check for n
@@ -19,7 +19,7 @@ func fixedLeadingZeros(sha1sum []byte, n uint) {
 		}
 
 		if n < 8 {
-			mask := uint8((1 << uint(8 - n)) - 1)
+			mask := uint8((1 << uint(8-n)) - 1)
 			sha1sum[i] = sha1sum[i] & mask
 			break
 		} else {
@@ -40,7 +40,7 @@ func TestLeadingZeros(t *testing.T) {
 			n := countLeadingZeros(input)
 			return (n >= bits)
 		},
-		gen.SliceOfN(20, gen.UInt8Range(1,255)),
+		gen.SliceOfN(20, gen.UInt8Range(1, 255)),
 		gen.UIntRange(0, 20*8),
 	))
 	properties.TestingRun(t)
@@ -58,7 +58,7 @@ func TestMint(t *testing.T) {
 
 			return len(strings.Split(stamp, ":")) == 7
 		},
-		gen.UIntRange(0, 20), // bits
+		gen.UIntRange(0, 20),         // bits
 		gen.Const("give me a token"), // generate a printable string
 	))
 	properties.TestingRun(t)

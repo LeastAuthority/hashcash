@@ -2,13 +2,13 @@ package hashcash
 
 import (
 	"bytes"
-	"encoding/base64"
-	"encoding/binary"
 	"crypto/rand"
 	"crypto/sha1"
+	"encoding/base64"
+	"encoding/binary"
 	"fmt"
-	"time"
 	"strconv"
+	"time"
 )
 
 type Stamp struct {
@@ -25,11 +25,11 @@ func (stamp Stamp) String() string {
 }
 
 func Mint(bits uint, resource string) (string, error) {
-	randBits := make([]byte, 12) // 96-bits of random data
+	randBits := make([]byte, 12)   // 96-bits of random data
 	counterBits := make([]byte, 8) // for counter
 
 	if bits > (sha1.Size * 8) {
-		return "", fmt.Errorf("number of bits should be ≤ %d", sha1.Size * 8)
+		return "", fmt.Errorf("number of bits should be ≤ %d", sha1.Size*8)
 	}
 
 	_, err := rand.Read(randBits)
@@ -43,6 +43,7 @@ func Mint(bits uint, resource string) (string, error) {
 		return "", err
 	}
 	counter := binary.BigEndian.Uint64(counterBits)
+
 	// had to look up the source code to understand the format
 	// string to be given. https://golang.org/src/time/format.go
 	timestamp := time.Now().Format("060102")
