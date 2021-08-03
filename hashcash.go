@@ -64,36 +64,8 @@ func Valid(stamp string, bits uint) bool {
 	hash := sha1.New()
 	sha1sum := hash.Sum(buffer.Bytes())
 
-	return leadingBits(sha1sum, bits)
-}
-
-func leadingBits(shasum []byte, requiredBits uint) bool {
-	bits := uint(0)
-	for _, b := range shasum {
-		if bits >= requiredBits {
-			return true
-		}
-		if requiredBits - bits > 8 {
-			if b == 0 {
-				bits += 8
-			} else {
-				return false
-			}
-		} else {
-			mask := uint(1 << 7)
-			for i := 0; i < 8; i++ {
-				if (uint(b) & mask) != 0 {
-					return false
-				}
-				bits += 1
-				mask = mask >> 1
-				if bits >= requiredBits {
-					return true
-				}
-			}
-		}
-	}
-	return true
+	n := countLeadingZeros(sha1sum)
+	return (n >= bits)
 }
 
 func countLeadingZeros(buf []byte) uint {
