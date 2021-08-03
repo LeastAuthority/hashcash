@@ -65,13 +65,12 @@ func Mint(bits uint, resource string) (string, error) {
 	return "", fmt.Errorf("could not mint a stamp for %d bits and resource \"%s\"", bits, resource)
 }
 
-func Valid(stamp string, bits uint) bool {
+func Valid(stamp string, requiredBits uint) bool {
 	buffer := bytes.NewBufferString(stamp)
-	hash := sha1.New()
-	sha1sum := hash.Sum(buffer.Bytes())
+	sha1sum := sha1.Sum(buffer.Bytes())
 
-	n := countLeadingZeros(sha1sum)
-	return (n >= bits)
+	actualBits := countLeadingZeros(sha1sum[:])
+	return (actualBits >= requiredBits)
 }
 
 func countLeadingZeros(buf []byte) uint {
