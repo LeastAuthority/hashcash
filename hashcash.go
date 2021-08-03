@@ -98,8 +98,8 @@ func leadingBits(shasum []byte, requiredBits uint) bool {
 	return true
 }
 
-func leadingZeros(buf []byte) int {
-	zCount := 0
+func countLeadingZeros(buf []byte) uint {
+	var zCount uint
 	for _, b := range buf {
 		if b == 0 {
 			zCount += 8
@@ -108,7 +108,7 @@ func leadingZeros(buf []byte) int {
 			mask = 1 << 7
 			for i := 0; i < 8; i++ {
 				if (byte(b) & mask) != 0 {
-					return (zCount + i)
+					return (zCount + uint(i))
 				}
 				mask = mask >> 1
 			}
