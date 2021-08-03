@@ -1,6 +1,6 @@
 # hashcash
 
-This repo implements [hashcash](https://hashcash.org) in Go. A few
+This repo implements [hashcash](http://hashcash.org) in Go. A few
 simple primitives like `Mint` and `Valid` functions are exposed out of
 this module. There are some tests that use the property-based testing
 library. However they are not very exhaustive yet.
