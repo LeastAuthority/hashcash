@@ -3,6 +3,7 @@ package hashcash
 import (
 	"bytes"
 	"encoding/base64"
+	"encoding/binary"
 	"crypto/rand"
 	"crypto/sha1"
 	"fmt"
@@ -25,30 +26,35 @@ func (stamp Stamp) String() string {
 
 func Mint(bits uint, resource string) (string, error) {
 	randBits := make([]byte, 12) // 96-bits of random data
-	counter := uint(0)
+	counterBits := make([]byte, 8) // for counter
 
 	if bits > (sha1.Size * 8) {
 		return "", fmt.Errorf("number of bits should be ≤ %d", sha1.Size * 8)
 	}
 
+	_, err := rand.Read(randBits)
+	if err != nil {
+		return "", err
+	}
+	randString := base64.StdEncoding.EncodeToString(randBits)
+
+	_, err = rand.Read(counterBits)
+	if err != nil {
+		return "", err
+	}
+	counter := binary.BigEndian.Uint64(counterBits)
 	// had to look up the source code to understand the format
 	// string to be given. https://golang.org/src/time/format.go
 	timestamp := time.Now().Format("060102")
 	for true {
-		_, err := rand.Read(randBits)
-		if err != nil {
-			return "", err
-		}
-		randString := base64.StdEncoding.EncodeToString(randBits)
 		countString := strconv.Itoa(int(counter))
-		counterString := base64.StdEncoding.EncodeToString([]byte(countString))
 		attempt := Stamp{
 			Version:  1,
 			Bits:     bits,
 			Date:     timestamp,
 			Resource: resource,
 			Rand:     randString,
-			Counter:  counterString,
+			Counter:  countString,
 		}
 		if Valid(attempt.String(), bits) {
 			return attempt.String(), nil
