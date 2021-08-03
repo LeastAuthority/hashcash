@@ -50,9 +50,7 @@ func Mint(bits uint, resource string) (string, error) {
 			Rand:     randString,
 			Counter:  counterString,
 		}
-		fmt.Printf("generated stamp: %s\n", attempt.String())
 		if Valid(attempt.String(), bits) {
-			fmt.Printf("found a valid stamp\n")
 			return attempt.String(), nil
 		}
 		counter += 1
