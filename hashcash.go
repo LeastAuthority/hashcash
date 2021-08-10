@@ -47,7 +47,7 @@ func Mint(bits uint, resource string) (string, error) {
 	// had to look up the source code to understand the format
 	// string to be given. https://golang.org/src/time/format.go
 	timestamp := time.Now().Format("060102")
-	for true {
+	for {
 		countString := strconv.Itoa(int(counter))
 		attempt := Stamp{
 			Version:  1,
