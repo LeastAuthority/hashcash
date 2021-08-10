@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-type Stamp struct {
+type stamp struct {
 	Version  int
 	Bits     uint
 	Date     string
