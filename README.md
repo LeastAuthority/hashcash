@@ -1,7 +1,7 @@
 # hashcash
 
-This repo implements [hashcash](http://hashcash.org) in Go. A few
-simple primitives like `Mint` and `Valid` functions are exposed out of
+This repo implements [hashcash](http://hashcash.org) in Go. A couple of
+simple primitives like `Mint` and `Evaluate` functions are exposed out of
 this module.
 
 To use the library, simply import the library from the git repository.
