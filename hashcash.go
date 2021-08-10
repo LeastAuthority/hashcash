@@ -20,7 +20,7 @@ type stamp struct {
 	Counter  string
 }
 
-func (stamp Stamp) String() string {
+func (stamp stamp) String() string {
 	return fmt.Sprintf("%d:%d:%s:%s::%s:%s", stamp.Version, stamp.Bits, stamp.Date, stamp.Resource, stamp.Rand, stamp.Counter)
 }
 
@@ -49,7 +49,7 @@ func Mint(bits uint, resource string) (string, error) {
 	timestamp := time.Now().Format("060102")
 	for {
 		countString := strconv.Itoa(int(counter))
-		attempt := Stamp{
+		attempt := stamp{
 			Version:  1,
 			Bits:     bits,
 			Date:     timestamp,
@@ -57,7 +57,7 @@ func Mint(bits uint, resource string) (string, error) {
 			Rand:     randString,
 			Counter:  countString,
 		}
-		if Valid(attempt.String(), bits) {
+		if IsValid(attempt.String(), bits) {
 			return attempt.String(), nil
 		}
 		counter += 1
