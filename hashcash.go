@@ -67,28 +67,58 @@ func Mint(bits uint, resource string) (string, error) {
 	return "", fmt.Errorf("could not mint a stamp for %d bits and resource \"%s\"", bits, resource)
 }
 
-// XXX This is for the server side to evaluate the stamp. we are not
-// looking at the timestamp for expiry. This function should take some
-// kind of a duration in "days" as input (since the resolution of
-// timestamp is in days (YYMMDD) and reject stamps that has expired.
-func Evaluate(stamp string, requiredBits uint, resource string) bool {
+// This is for the server side to evaluate the stamp.  The 'expiry'
+// input takes the number of days to check whether the issued stamp is
+// valid at the time of "evaluating" it. A zero for the 'expiry'
+// indicates that the stamp is valid indefinitely. The reference
+// hashcash implementation's commandline program has a default expiry
+// of 28 days.
+func Evaluate(stamp string, requiredBits uint, resource string, expiry uint) (bool, error) {
 	parts := strings.Split(stamp, ":")
 	if len(parts) != 7 {
-		return false
+		return false, fmt.Errorf("Stamp should have seven fields")
 	}
 	// stamp is of the form:
 	// <ver>:<bits>:<timestamp>:<resource>::rand:counter
 	ver := parts[0]
 	bits, err := strconv.ParseUint(parts[1], 10, 32)
 	if err != nil {
-		return false
+		return false, fmt.Errorf("Invalid bits field in the stamp")
 	}
-	res := parts[3]
+	// timestamp is in YYMMDD format.
+	ts, err := time.Parse("060102", parts[2])
+	if err != nil {
+		return false, fmt.Errorf("Invalid timestamp in the stamp string")
+	}
 
-	return validatePartialHash(stamp, requiredBits) &&
-		(res == resource) &&
-		(ver == "1") &&
-		(bits == uint64(requiredBits))
+	// skip timestamp check if expiry is zero
+	if expiry != 0 {
+		// add expiry to the timestamp and check if it is expired now.
+		endDate := ts.AddDate(0, 0, int(expiry))
+		curTime := time.Now()
+		if curTime.After(endDate) {
+			// stamp has expired
+			return false, fmt.Errorf("stamp has expired")
+		}
+	}
+
+	if !validatePartialHash(stamp, requiredBits) {
+		return false, fmt.Errorf("Invalid Partial hash for the stamp")
+	}
+
+	if parts[3] != resource {
+		return false, fmt.Errorf("Resource in the stamp does not match with the issued resource")
+	}
+
+	if ver != "1" {
+		return false, fmt.Errorf("Unsupported hashcash stamp format")
+	}
+
+	if bits != uint64(requiredBits) {
+		return false, fmt.Errorf("Bits field in the stamp does not match the issued bits")
+	}
+
+	return true, nil
 }
 
 func validatePartialHash(stamp string, requiredBits uint) bool {

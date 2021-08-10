@@ -48,17 +48,18 @@ func TestLeadingZeros(t *testing.T) {
 func TestMint(t *testing.T) {
 	properties := gopter.NewProperties(nil)
 	properties.Property("generate random stamp and a random number of required zero bits and check validity", prop.ForAll(
-		func(bits uint, resource string) bool {
+		func(bits uint, resource string, expiry uint) bool {
 			// mint a valid stamp and check the resulting
 			stamp, err := Mint(bits, resource)
 			if err != nil {
 				t.Errorf("minting unsuccessful: %v", err)
 			}
-
-			return Evaluate(stamp, bits, resource)
+			v, _ := Evaluate(stamp, bits, resource, expiry)
+			return v
 		},
 		gen.UIntRange(0, 20),         // bits
 		gen.Const("give me a token"), // generate a printable string
+		gen.UIntRange(0, 60),         // expiry in number of days
 	))
 	properties.TestingRun(t)
 }
