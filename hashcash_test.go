@@ -4,7 +4,6 @@ import (
 	"github.com/leanovate/gopter"
 	"github.com/leanovate/gopter/gen"
 	"github.com/leanovate/gopter/prop"
-	"strings"
 	"testing"
 )
 
@@ -56,7 +55,7 @@ func TestMint(t *testing.T) {
 				t.Errorf("minting unsuccessful: %v", err)
 			}
 
-			return len(strings.Split(stamp, ":")) == 7
+			return Evaluate(stamp, bits, resource)
 		},
 		gen.UIntRange(0, 20),         // bits
 		gen.Const("give me a token"), // generate a printable string

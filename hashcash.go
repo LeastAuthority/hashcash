@@ -8,6 +8,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -57,7 +58,7 @@ func Mint(bits uint, resource string) (string, error) {
 			Rand:     randString,
 			Counter:  countString,
 		}
-		if IsValid(attempt.String(), bits) {
+		if validatePartialHash(attempt.String(), bits) {
 			return attempt.String(), nil
 		}
 		counter += 1
@@ -66,7 +67,31 @@ func Mint(bits uint, resource string) (string, error) {
 	return "", fmt.Errorf("could not mint a stamp for %d bits and resource \"%s\"", bits, resource)
 }
 
-func IsValid(stamp string, requiredBits uint) bool {
+// XXX This is for the server side to evaluate the stamp. we are not
+// looking at the timestamp for expiry. This function should take some
+// kind of a duration in "days" as input (since the resolution of
+// timestamp is in days (YYMMDD) and reject stamps that has expired.
+func Evaluate(stamp string, requiredBits uint, resource string) bool {
+	parts := strings.Split(stamp, ":")
+	if len(parts) != 7 {
+		return false
+	}
+	// stamp is of the form:
+	// <ver>:<bits>:<timestamp>:<resource>::rand:counter
+	ver := parts[0]
+	bits, err := strconv.ParseUint(parts[1], 10, 32)
+	if err != nil {
+		return false
+	}
+	res := parts[3]
+
+	return validatePartialHash(stamp, requiredBits) &&
+		(res == resource) &&
+		(ver == "1") &&
+		(bits == uint64(requiredBits))
+}
+
+func validatePartialHash(stamp string, requiredBits uint) bool {
 	buffer := bytes.NewBufferString(stamp)
 	sha1sum := sha1.Sum(buffer.Bytes())
 
